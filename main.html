@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ice Cream Question</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ffd1dc 0%, #ffb6c1 50%, #ffc0cb 100%);
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 60px 50px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #d4527a;
+            margin-bottom: 40px;
+            line-height: 1.4;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 16px 40px;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .yes-btn {
+            background: #ff8fab;
+            color: white;
+            transform: scale(1);
+        }
+
+        .yes-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 143, 171, 0.4);
+        }
+
+        .no-btn {
+            background: #ffe4e9;
+            color: #d4527a;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .no-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(212, 82, 122, 0.2);
+        }
+
+        .no-btn.moving {
+            position: fixed;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0) scale(1); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px) scale(1); }
+            20%, 40%, 60%, 80% { transform: translateX(10px) scale(1); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes grow {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .grow {
+            animation: grow 0.3s ease;
+        }
+
+        .celebration {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .celebration.active {
+            display: flex;
+        }
+
+        .celebration h2 {
+            font-size: 48px;
+            color: #ff8fab;
+            margin-bottom: 20px;
+        }
+
+        .celebration p {
+            font-size: 24px;
+            color: #d4527a;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .celebration.active {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .falling-emoji {
+            position: fixed;
+            font-size: 32px;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-30px) scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(200px) scale(0.8);
+                opacity: 0;
+            }
+        }
+
+        .falling-emoji {
+            animation: fall 1.5s ease-out forwards;
+        }
+
+        .confetti-heart {
+            position: fixed;
+            font-size: 24px;
+            pointer-events: none;
+            z-index: 1001;
+            opacity: 0;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .confetti-heart {
+            animation: confetti-fall linear forwards;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 40px 30px;
+            }
+
+            h1 {
+                font-size: 24px;
+                margin-bottom: 30px;
+            }
+
+            button {
+                padding: 14px 32px;
+                font-size: 16px;
+            }
+
+            .button-container {
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Do you want a chocolate fudge ice cream?</h1>
+        <div class="button-container">
+            <button class="yes-btn" id="yesBtn">Yes</button>
+            <button class="no-btn" id="noBtn">No</button>
+        </div>
+    </div>
+
+    <div class="celebration" id="celebration">
+        <h2>🍦 Yay! 🍦</h2>
+        <p>Enjoy your chocolate fudge ice cream!</p>
+    </div>
+
+    <script>
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const celebration = document.getElementById('celebration');
+        
+        let noClickCount = 0;
+        let isMoving = false;
+        
+        // Yes button click handler
+        yesBtn.addEventListener('click', () => {
+            celebration.classList.add('active');
+            createConfetti();
+        });
+        
+        // Create confetti hearts effect
+        function createConfetti() {
+            const heartSymbols = ['❤️', '💕', '💖', '💗', '💓', '💝'];
+            const confettiCount = 50;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'confetti-heart';
+                    heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+                    
+                    // Random horizontal position
+                    heart.style.left = Math.random() * 100 + '%';
+                    
+                    // Random animation duration between 2-4 seconds
+                    const duration = 2 + Math.random() * 2;
+                    heart.style.animationDuration = duration + 's';
+                    
+                    // Random delay for staggered effect
+                    heart.style.animationDelay = (Math.random() * 0.5) + 's';
+                    
+                    document.body.appendChild(heart);
+                    
+                    // Remove heart after animation completes
+                    setTimeout(() => {
+                        heart.remove();
+                    }, (duration + 0.5) * 1000);
+                }, i * 50); // Stagger creation
+            }
+        }
+        
+        // No button click handler
+        noBtn.addEventListener('click', (e) => {
+            if (noClickCount < 3) {
+                e.stopPropagation();
+                noClickCount++;
+                
+                // Create falling emoji
+                createFallingEmoji(e.clientX, e.clientY);
+                
+                // Shake the No button
+                noBtn.classList.add('shake');
+                setTimeout(() => {
+                    noBtn.classList.remove('shake');
+                }, 500);
+                
+                // Grow the Yes button
+                yesBtn.classList.add('grow');
+                const currentScale = 1 + (noClickCount * 0.5);
+                yesBtn.style.transform = `scale(${currentScale})`;
+                
+                setTimeout(() => {
+                    yesBtn.classList.remove('grow');
+                }, 300);
+                
+                // After 3 clicks, enable movement
+                if (noClickCount >= 3) {
+                    isMoving = true;
+                    noBtn.classList.add('moving');
+                }
+            }
+        });
+        
+        // Create falling emoji effect
+        function createFallingEmoji(x, y) {
+            const emoji = document.createElement('div');
+            emoji.textContent = '😭';
+            emoji.className = 'falling-emoji';
+            emoji.style.left = `${x}px`;
+            emoji.style.top = `${y}px`;
+            document.body.appendChild(emoji);
+            
+            // Remove emoji after animation completes
+            setTimeout(() => {
+                emoji.remove();
+            }, 1500);
+        }
+        
+        // Move the No button away from cursor
+        function moveButton(e) {
+            if (!isMoving) return;
+            
+            const btnRect = noBtn.getBoundingClientRect();
+            const btnCenterX = btnRect.left + btnRect.width / 2;
+            const btnCenterY = btnRect.top + btnRect.height / 2;
+            
+            const distanceX = e.clientX - btnCenterX;
+            const distanceY = e.clientY - btnCenterY;
+            const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+            
+            // If cursor is close to button (within 250px), move it away
+            if (distance < 250) {
+                const angle = Math.atan2(distanceY, distanceX);
+                
+                // Calculate new position (move away from cursor)
+                let newX = btnCenterX - Math.cos(angle) * 300;
+                let newY = btnCenterY - Math.sin(angle) * 300;
+                
+                // Keep button within viewport
+                const margin = 20;
+                newX = Math.max(margin + btnRect.width / 2, Math.min(window.innerWidth - margin - btnRect.width / 2, newX));
+                newY = Math.max(margin + btnRect.height / 2, Math.min(window.innerHeight - margin - btnRect.height / 2, newY));
+                
+                noBtn.style.left = `${newX - btnRect.width / 2}px`;
+                noBtn.style.top = `${newY - btnRect.height / 2}px`;
+            }
+        }
+        
+        // Track mouse movement
+        document.addEventListener('mousemove', moveButton);
+        
+        // Also trigger on hover attempt
+        noBtn.addEventListener('mouseenter', (e) => {
+            if (isMoving) {
+                moveButton(e);
+            }
+        });
+        
+        // Touch support for mobile
+        document.addEventListener('touchmove', (e) => {
+            if (isMoving && e.touches.length > 0) {
+                moveButton(e.touches[0]);
+            }
+        });
+    </script>
+</body>
+</html>
